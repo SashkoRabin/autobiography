@@ -1,48 +1,84 @@
 "use client";
 
-import { motion } from "framer-motion";
-
 import { useBookStore } from "@/stores/book.store";
 
-export const BookCover = () => {
-  const { nextSpread } = useBookStore();
+type Props = {
+  side?: "front" | "back" | "inside";
+  interactive?: boolean;
+};
+
+export const BookCover = ({
+  side = "front",
+  interactive = true,
+}: Props) => {
+  const {
+    nextSpread,
+    prevSpread,
+  } = useBookStore();
+
+  const isFront = side === "front";
+  const isBack = side === "back";
 
   return (
-    <motion.div
-      onClick={nextSpread}
-      initial={{
-        rotateY: 0,
-      }}
-      animate={{
-        rotateY: 0,
-      }}
-      whileHover={{
-        scale: 1.02,
-      }}
-      transition={{
-        duration: 0.8,
-      }}
-      className="
+    <div
+      onPointerDown={
+        interactive
+          ? (event) => {
+              const rect =
+                event.currentTarget.getBoundingClientRect();
+
+              const isLeftHalf =
+                event.clientX <
+                rect.left + rect.width / 2;
+
+              if (
+                (isFront || isBack) &&
+                isLeftHalf
+              ) {
+                prevSpread();
+              } else {
+                nextSpread();
+              }
+            }
+          : undefined
+      }
+      className={`
         relative
         w-full
         h-full
-        bg-[#4a3326]
+        ${interactive ? "cursor-pointer" : ""}
+        overflow-hidden
         rounded-r-md
         rounded-l-sm
-        shadow-2xl
-        cursor-pointer
-        overflow-hidden
+        ${
+          isBack
+            ? "bg-[#3d2a20]"
+            : side === "inside"
+              ? "bg-[#6a5038]"
+              : "bg-[#4a3326]"
+        }
         select-none
-      "
+        transition-transform
+        duration-300
+        ${interactive ? "hover:scale-[1.01]" : ""}
+      `}
       style={{
-        transformStyle: "preserve-3d",
-        transformOrigin: "left center",
+        backfaceVisibility: "hidden",
       }}
     >
-      {/* left spine */}
-      <div className="absolute left-0 top-0 w-6 h-full bg-[#2d1d15]" />
+      {/* spine */}
+      <div
+        className={`
+          absolute
+          ${isBack ? "right-0" : "left-0"}
+          top-0
+          h-full
+          w-8
+          bg-[#2d1d15]
+        `}
+      />
 
-      {/* texture */}
+      {/* cover texture */}
       <div
         className="
           absolute
@@ -53,7 +89,7 @@ export const BookCover = () => {
         "
       />
 
-      {/* vignette */}
+      {/* lighting */}
       <div
         className="
           absolute
@@ -65,46 +101,59 @@ export const BookCover = () => {
         "
       />
 
-      {/* title */}
-      <div
-        className="
-          relative
-          z-10
-          flex
-          flex-col
-          items-center
-          justify-center
-          w-full
-          h-full
-          text-[#d9c7a3]
-        "
-      >
-        <h1
+      {isFront && (
+        <div
           className="
-            text-5xl
-            font-serif
-            tracking-wide
-            text-center
-            leading-tight
-            px-8
+            relative
+            z-10
+            flex
+            h-full
+            w-full
+            flex-col
+            items-center
+            justify-center
+            text-[#d9c7a3]
           "
         >
-          The Story of
-          <br />
-          Merkulov Oleksandr
-        </h1>
+          <h1
+            className="
+              px-8
+              text-center
+              text-5xl
+              leading-tight
+              font-serif
+              tracking-wide
+            "
+          >
+            The Story of
+            <br />
+            Merkulov Oleksandr
+          </h1>
 
-        <p
+          <p
+            className="
+              mt-8
+              text-sm
+              uppercase
+              tracking-[0.4em]
+            "
+          >
+            Interactive Resume
+          </p>
+        </div>
+      )}
+
+      {isBack && (
+        <div
           className="
-            mt-8
-            text-sm
-            uppercase
-            tracking-[0.4em]
+            absolute
+            inset-10
+            rounded-sm
+            border
+            border-[#8d6b4a]/50
           "
-        >
-          Interactive Resume
-        </p>
-      </div>
-    </motion.div>
+        />
+      )}
+    </div>
   );
 };

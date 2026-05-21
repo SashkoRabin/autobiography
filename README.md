@@ -1,33 +1,40 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Interactive Autobiography Resume Book
+
+An immersive portfolio presented as a physical autobiography book. The project focuses on frontend engineering, tactile interaction, animation systems, and a premium vintage paper feel.
+
+The current phase is the book engine foundation: cover states, open spreads, one-page flipping, drag interaction, page numbering, clickable contents, automatic chapter pagination, and visible paper thickness.
+
+## Documentation
+
+- [Book engine architecture](./docs/book-engine.md)
 
 ## Getting Started
 
 First, run the development server:
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
 pnpm dev
-# or
-bun dev
 ```
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+Open [http://localhost:3000](http://localhost:3000) with your browser.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Useful Commands
 
-## Learn More
+```bash
+pnpm lint
+pnpm build
+npx tsc --noEmit
+```
 
-To learn more about Next.js, take a look at the following resources:
+## Project Notes
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+The book engine is intentionally split into state, pure page math, interaction hooks, registry content, pagination, and visual components. Keep future chapter work registry-driven and avoid hardcoded page logic inside React views.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+Numbered pages start at `Contents`. The left author page is unnumbered and currently uses placeholder copy under the title `History`. If that author copy becomes too long, the overflow is carried into generated continuation pages with the same `history` chapter ownership.
+
+Closed covers use mirrored hit zones: on the front cover the left half turns to the back cover and the right half opens the book; on the back cover the left half opens the book from the last spread and the right half turns back to the front cover.
 
 ## Deploy on Vercel
 
