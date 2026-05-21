@@ -14,7 +14,7 @@ export const BookContents = () => {
       aria-label="Book contents"
       className="
         mt-8
-        max-w-[32ch]
+        max-w-[36ch]
         font-serif
       "
     >
@@ -81,4 +81,3 @@ export const BookContents = () => {
     </nav>
   );
 };
-

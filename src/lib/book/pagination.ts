@@ -1,58 +1,95 @@
 import type { BookPageContent } from "@/types/book";
 
-const TEXT_PAGE_CHARACTER_LIMIT = 360;
+const TEXT_PAGE_CHARACTER_LIMIT = 450;
+const SKILLS_PAGE_CHARACTER_LIMIT = 350;
+const INTRODUCTION_PAGE_CHARACTER_LIMIT = 350;
 
-const splitLongWord = (word: string) => {
+const normalizeParagraphBreaks = (body: string) =>
+  body.replace(/\\n/g, "\n");
+
+const splitLongWord = (
+  word: string,
+  characterLimit: number
+) => {
   const parts: string[] = [];
 
   for (
     let index = 0;
     index < word.length;
-    index += TEXT_PAGE_CHARACTER_LIMIT
+    index += characterLimit
   ) {
     parts.push(
-      word.slice(index, index + TEXT_PAGE_CHARACTER_LIMIT)
+      word.slice(index, index + characterLimit)
     );
   }
 
   return parts;
 };
 
-const splitBodyIntoPages = (body: string) => {
-  const words = body.trim().split(/\s+/);
+const splitBodyIntoPages = (
+  body: string,
+  firstPageCharacterLimit = TEXT_PAGE_CHARACTER_LIMIT,
+  nextPageCharacterLimit = firstPageCharacterLimit
+) => {
+  const normalizedBody =
+    normalizeParagraphBreaks(body).trim();
+
+  const paragraphs = normalizedBody
+    .split("\n")
+    .map((paragraph) => paragraph.trim())
+    .filter(Boolean);
+
   const pages: string[] = [];
+
   let currentPage = "";
 
-  words.forEach((word) => {
-    if (word.length > TEXT_PAGE_CHARACTER_LIMIT) {
-      if (currentPage) {
-        pages.push(currentPage);
-        currentPage = "";
-      }
+  const pushCurrentPage = () => {
+    if (!currentPage.trim()) return;
 
-      pages.push(...splitLongWord(word));
-      return;
+    pages.push(currentPage.trim());
+
+    currentPage = "";
+  };
+
+  const getCurrentPageLimit = () =>
+    pages.length === 0
+      ? firstPageCharacterLimit
+      : nextPageCharacterLimit;
+
+  paragraphs.forEach((paragraph) => {
+    const characterLimit =
+      getCurrentPageLimit();
+
+    const paragraphWithSpacing =
+      currentPage.length === 0
+        ? paragraph
+        : `\n\n${paragraph}`;
+
+    if (
+      currentPage.length +
+        paragraphWithSpacing.length >
+      characterLimit
+    ) {
+      pushCurrentPage();
+
+      currentPage = paragraph;
+    } else {
+      currentPage += paragraphWithSpacing;
     }
-
-    const nextPage = currentPage
-      ? `${currentPage} ${word}`
-      : word;
-
-    if (nextPage.length > TEXT_PAGE_CHARACTER_LIMIT) {
-      pages.push(currentPage);
-      currentPage = word;
-      return;
-    }
-
-    currentPage = nextPage;
   });
 
-  if (currentPage) {
-    pages.push(currentPage);
-  }
+  pushCurrentPage();
 
-  return pages.length ? pages : [body];
+  return pages.length
+    ? pages
+    : [body];
 };
+
+const calculateNextPageCharacterLimit = (page: BookPageContent, characterLimit: number) => {
+  if (page.template === "introduction") return TEXT_PAGE_CHARACTER_LIMIT;
+  if (page.template === "skills") return SKILLS_PAGE_CHARACTER_LIMIT;
+  return characterLimit
+}
 
 export const paginateBookPages = (
   sourcePages: BookPageContent[]
@@ -62,10 +99,25 @@ export const paginateBookPages = (
       return [page];
     }
 
-    const bodyPages = splitBodyIntoPages(page.body);
+    const characterLimit =
+      page.template === "introduction"
+        ? INTRODUCTION_PAGE_CHARACTER_LIMIT
+        : TEXT_PAGE_CHARACTER_LIMIT;
+
+    const nextPageCharacterLimit = calculateNextPageCharacterLimit(page, characterLimit);
+
+    const bodyPages = splitBodyIntoPages(
+      page.body,
+      characterLimit,
+      nextPageCharacterLimit
+    );
 
     return bodyPages.map((body, index) => ({
       ...page,
+      template:
+        index === 0 ? page.template : "text",
+      imageSrc:
+        index === 0 ? page.imageSrc : undefined,
       id:
         index === 0
           ? page.id

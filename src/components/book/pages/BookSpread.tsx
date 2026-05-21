@@ -112,6 +112,7 @@ export const BookSpread = () => {
           title={leftPage?.title ?? ""}
           body={leftPage?.body}
           template={leftPage?.template}
+          imageSrc={leftPage?.imageSrc}
           pageNumber={
             leftPage
               ? getPrintedPageNumber(baseLeftIndex)
@@ -124,6 +125,7 @@ export const BookSpread = () => {
           title={rightPage?.title ?? ""}
           body={rightPage?.body}
           template={rightPage?.template}
+          imageSrc={rightPage?.imageSrc}
           pageNumber={
             rightPage
               ? getPrintedPageNumber(baseRightIndex)

@@ -1,10 +1,13 @@
+import Image from "next/image";
+
 import { BookContents } from "../navigation/BookContents";
 
 type Props = {
   side: "left" | "right";
   title: string;
   body?: string;
-  template?: "text" | "contents";
+  template?: "text" | "contents" | "introduction" | "skills";
+  imageSrc?: string;
   pageNumber?: number;
   fill?: boolean;
   showContent?: boolean;
@@ -15,10 +18,14 @@ export const BookPage = ({
   title,
   body,
   template = "text",
+  imageSrc,
   pageNumber,
   fill = false,
   showContent = true,
 }: Props) => {
+  const formattedBody =
+    body?.replace(/\\n/g, "\n");
+
   return (
     <div
       className={`
@@ -191,19 +198,59 @@ export const BookPage = ({
 
             {template === "contents" ? (
               <BookContents />
+            ) : template === "introduction" && body ? (
+              <div
+                className="
+                  mt-7
+                  max-w-[36ch]
+                  font-serif
+                  text-xl
+                  leading-8
+                  text-[#4a3828]/85
+                "
+              >
+                {imageSrc && (
+                  <Image
+                    src={imageSrc}
+                    alt=""
+                    width={160}
+                    height={240}
+                    className="
+                      float-left
+                      mr-5
+                      mb-3
+                      h-60
+                      w-40
+                      rounded-sm
+                      border
+                      border-[#8d6b4a]/45
+                      object-cover
+                      object-top
+                      sepia
+                      shadow-[0_8px_18px_rgba(68,45,25,0.32)]
+                    "
+                  />
+                )}
+
+                <p className="whitespace-pre-wrap break-words">
+                  {formattedBody}
+                </p>
+              </div>
             ) : body ? (
-              <p
+              <div
                 className="
                   mt-8
-                  max-w-[28ch]
+                  max-w-[36ch]
                   font-serif
                   text-xl
                   leading-8
                   text-[#4a3828]/80
                 "
               >
-                {body}
-              </p>
+                <p className="whitespace-pre-wrap break-words">
+                  {formattedBody}
+                </p>
+              </div>
             ) : null}
           </>
         )}

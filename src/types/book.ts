@@ -15,9 +15,10 @@ export type CoverMotion =
 export type BookPageContent = {
   id: string;
   chapterId: string;
-  template?: "text" | "contents";
+  template?: "text" | "contents" | "introduction" | "skills";
   title: string;
   body?: string;
+  imageSrc?: string;
 };
 
 export type BookChapter = {

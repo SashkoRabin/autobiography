@@ -93,6 +93,7 @@ export const BookPageSheet = () => {
           title={frontPage?.title ?? ""}
           body={frontPage?.body}
           template={frontPage?.template}
+          imageSrc={frontPage?.imageSrc}
           pageNumber={
             frontPage
               ? getPrintedPageNumber(frontIndex)
@@ -117,6 +118,7 @@ export const BookPageSheet = () => {
           title={backPage?.title ?? ""}
           body={backPage?.body}
           template={backPage?.template}
+          imageSrc={backPage?.imageSrc}
           pageNumber={
             backPage
               ? getPrintedPageNumber(backIndex)

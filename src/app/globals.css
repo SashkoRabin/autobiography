@@ -14,3 +14,16 @@ body {
 * {
   box-sizing: border-box;
 }
+
+.book-phone-frame {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.book-phone-rotator {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transform-origin: center;
+}
