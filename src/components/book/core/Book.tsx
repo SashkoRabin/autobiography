@@ -14,7 +14,11 @@ import { useBookKeyboard } from "@/hooks/useBookKeyboard";
 import { BookCover } from "../cover/BookCover";
 import { BookSpread } from "../pages/BookSpread";
 
-export const Book = () => {
+type Props = {
+  isMobile?: boolean;
+};
+
+export const Book = ({ isMobile = false }: Props) => {
   const {
     bookView,
     coverMotion,
@@ -168,6 +172,7 @@ export const Book = () => {
           <BookCover
             key={`${coverSide}-${coverMotion ?? "rest"}`}
             side={coverSide}
+            simpleTap={isMobile}
           />
         </motion.div>
 

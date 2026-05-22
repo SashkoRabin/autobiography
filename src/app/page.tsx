@@ -90,7 +90,7 @@ export default function HomePage() {
               : undefined,
           }}
         >
-          <Book />
+          <Book isMobile={isPhonePortrait} />
         </div>
       </div>
     </main>

@@ -5,11 +5,13 @@ import { useBookStore } from "@/stores/book.store";
 type Props = {
   side?: "front" | "back" | "inside";
   interactive?: boolean;
+  simpleTap?: boolean;
 };
 
 export const BookCover = ({
   side = "front",
   interactive = true,
+  simpleTap = false,
 }: Props) => {
   const {
     nextSpread,
@@ -30,6 +32,16 @@ export const BookCover = ({
               const isLeftHalf =
                 event.clientX <
                 rect.left + rect.width / 2;
+
+              if (simpleTap) {
+                if (isFront) {
+                  nextSpread();
+                } else if (isBack) {
+                  prevSpread();
+                }
+
+                return;
+              }
 
               if (
                 (isFront || isBack) &&
