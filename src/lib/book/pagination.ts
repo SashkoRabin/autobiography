@@ -7,25 +7,6 @@ const INTRODUCTION_PAGE_CHARACTER_LIMIT = 350;
 const normalizeParagraphBreaks = (body: string) =>
   body.replace(/\\n/g, "\n");
 
-const splitLongWord = (
-  word: string,
-  characterLimit: number
-) => {
-  const parts: string[] = [];
-
-  for (
-    let index = 0;
-    index < word.length;
-    index += characterLimit
-  ) {
-    parts.push(
-      word.slice(index, index + characterLimit)
-    );
-  }
-
-  return parts;
-};
-
 const splitBodyIntoPages = (
   body: string,
   firstPageCharacterLimit = TEXT_PAGE_CHARACTER_LIMIT,
