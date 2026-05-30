@@ -1,5 +1,11 @@
 "use client";
 
+import {
+  useRef,
+  type MouseEvent,
+  type PointerEvent,
+} from "react";
+
 import { useBookStore } from "@/stores/book.store";
 
 type Props = {
@@ -13,6 +19,8 @@ export const BookCover = ({
   interactive = true,
   simpleTap = false,
 }: Props) => {
+  const lastPointerActionAt = useRef(0);
+
   const {
     nextSpread,
     prevSpread,
@@ -21,36 +29,70 @@ export const BookCover = ({
   const isFront = side === "front";
   const isBack = side === "back";
 
+  const handleCoverAction = (
+    event:
+      | PointerEvent<HTMLDivElement>
+      | MouseEvent<HTMLDivElement>
+  ) => {
+    const rect =
+      event.currentTarget.getBoundingClientRect();
+
+    const isLeftHalf =
+      event.clientX < rect.left + rect.width / 2;
+
+    if (simpleTap) {
+      if (isFront) {
+        nextSpread();
+      } else if (isBack) {
+        prevSpread();
+      }
+
+      return;
+    }
+
+    if ((isFront || isBack) && isLeftHalf) {
+      prevSpread();
+    } else {
+      nextSpread();
+    }
+  };
+
+  const shouldIgnoreSyntheticMouse = () =>
+    performance.now() - lastPointerActionAt.current <
+    400;
+
   return (
     <div
       onPointerDown={
         interactive
           ? (event) => {
-              const rect =
-                event.currentTarget.getBoundingClientRect();
-
-              const isLeftHalf =
-                event.clientX <
-                rect.left + rect.width / 2;
-
-              if (simpleTap) {
-                if (isFront) {
-                  nextSpread();
-                } else if (isBack) {
-                  prevSpread();
-                }
-
+              lastPointerActionAt.current =
+                performance.now();
+              handleCoverAction(event);
+            }
+          : undefined
+      }
+      onMouseDown={
+        interactive
+          ? (event) => {
+              if (shouldIgnoreSyntheticMouse()) {
                 return;
               }
 
-              if (
-                (isFront || isBack) &&
-                isLeftHalf
-              ) {
-                prevSpread();
-              } else {
-                nextSpread();
+              lastPointerActionAt.current =
+                performance.now();
+              handleCoverAction(event);
+            }
+          : undefined
+      }
+      onClick={
+        interactive && simpleTap
+          ? (event) => {
+              if (shouldIgnoreSyntheticMouse()) {
+                return;
               }
+
+              handleCoverAction(event);
             }
           : undefined
       }

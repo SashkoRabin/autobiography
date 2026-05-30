@@ -144,7 +144,7 @@ export const Book = ({ isMobile = false }: Props) => {
               : "none",
           }}
         >
-          <BookSpread />
+          <BookSpread isMobile={isMobile} />
         </motion.div>
 
         <motion.div

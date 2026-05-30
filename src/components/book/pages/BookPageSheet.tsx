@@ -18,7 +18,13 @@ import { BookPage } from "./BookPage";
 const getPage = (index: number) =>
   pages[index] ?? null;
 
-export const BookPageSheet = () => {
+type Props = {
+  isMobile?: boolean;
+};
+
+export const BookPageSheet = ({
+  isMobile = false,
+}: Props) => {
   const {
     flipDirection,
     isDragging,
@@ -47,6 +53,11 @@ export const BookPageSheet = () => {
     ? -180 * dragProgress
     : 180 * dragProgress;
 
+  const backFaceTransform =
+    isMobile && !isNext
+      ? "rotateY(180deg) translateZ(0.5px) scaleX(-1)"
+      : "rotateY(180deg) translateZ(0.5px)";
+
   return (
     <motion.div
       animate={{
@@ -65,6 +76,7 @@ export const BookPageSheet = () => {
           ? "left center"
           : "right center",
         transformStyle: "preserve-3d",
+        WebkitTransformStyle: "preserve-3d",
         willChange: "transform",
         zIndex: 1500,
         boxShadow:
@@ -84,7 +96,11 @@ export const BookPageSheet = () => {
           inset-0
         "
         style={{
+          transform: "translateZ(0.5px)",
           backfaceVisibility: "hidden",
+          WebkitBackfaceVisibility: "hidden",
+          transformStyle: "preserve-3d",
+          WebkitTransformStyle: "preserve-3d",
         }}
       >
         <BookPage
@@ -108,8 +124,11 @@ export const BookPageSheet = () => {
           inset-0
         "
         style={{
-          transform: "rotateY(180deg)",
+          transform: backFaceTransform,
           backfaceVisibility: "hidden",
+          WebkitBackfaceVisibility: "hidden",
+          transformStyle: "preserve-3d",
+          WebkitTransformStyle: "preserve-3d",
         }}
       >
         <BookPage

@@ -13,7 +13,7 @@ import type { FlipDirection } from "@/types/book";
 
 type DragMeta = {
   direction: FlipDirection;
-  startX: number;
+  startPosition: number;
   moved: boolean;
   lastProgress: number;
   lastTime: number;
@@ -22,6 +22,7 @@ type DragMeta = {
 type UsePageDragInput = {
   containerRef: RefObject<HTMLDivElement | null>;
   currentSpread: number;
+  isMobile?: boolean;
   pageCount: number;
   nextSpread: () => void;
   prevSpread: () => void;
@@ -40,6 +41,7 @@ type UsePageDragInput = {
 export const usePageDrag = ({
   containerRef,
   currentSpread,
+  isMobile = false,
   pageCount,
   nextSpread,
   prevSpread,
@@ -54,12 +56,16 @@ export const usePageDrag = ({
     const rect =
       containerRef.current?.getBoundingClientRect();
 
-    return rect ? rect.width / 2 : 450;
+    return rect
+      ? isMobile
+        ? rect.height / 2
+        : rect.width / 2
+      : 450;
   };
 
   const beginDragAt = (
     direction: FlipDirection,
-    clientX: number
+    position: number
   ) => {
     if (dragRef.current) return;
 
@@ -81,7 +87,7 @@ export const usePageDrag = ({
 
     dragRef.current = {
       direction,
-      startX: clientX,
+      startPosition: position,
       moved: false,
       lastProgress: 0,
       lastTime: performance.now(),
@@ -90,7 +96,7 @@ export const usePageDrag = ({
     startDrag(direction);
   };
 
-  const updateDragAt = (clientX: number) => {
+  const updateDragAt = (position: number) => {
     const drag = dragRef.current;
 
     if (!drag) return;
@@ -99,8 +105,8 @@ export const usePageDrag = ({
 
     const rawProgress =
       drag.direction === "next"
-        ? (drag.startX - clientX) / pageWidth
-        : (clientX - drag.startX) / pageWidth;
+        ? (drag.startPosition - position) / pageWidth
+        : (position - drag.startPosition) / pageWidth;
 
     const progress = Math.max(
       0,
@@ -157,13 +163,18 @@ export const usePageDrag = ({
       );
     }
 
-    beginDragAt(direction, event.clientX);
+    beginDragAt(
+      direction,
+      isMobile ? event.clientY : event.clientX
+    );
   };
 
   const updatePageDrag = (
     event: PointerEvent<HTMLDivElement>
   ) => {
-    updateDragAt(event.clientX);
+    updateDragAt(
+      isMobile ? event.clientY : event.clientX
+    );
   };
 
   const endPageDrag = (
@@ -186,7 +197,9 @@ export const usePageDrag = ({
     const handleMouseMove = (
       event: globalThis.MouseEvent
     ) => {
-      updateDragAt(event.clientX);
+      updateDragAt(
+        isMobile ? event.clientY : event.clientX
+      );
     };
 
     const handleTouchMove = (
@@ -195,7 +208,9 @@ export const usePageDrag = ({
       const touch = event.touches[0];
 
       if (touch) {
-        updateDragAt(touch.clientX);
+        updateDragAt(
+          isMobile ? touch.clientY : touch.clientX
+        );
       }
     };
 
@@ -237,4 +252,3 @@ export const usePageDrag = ({
     endPageDrag,
   };
 };
-

@@ -22,7 +22,13 @@ import { BookPageSheet } from "./BookPageSheet";
 
 import { PageStack } from "../thickness/PageStack";
 
-export const BookSpread = () => {
+type Props = {
+  isMobile?: boolean;
+};
+
+export const BookSpread = ({
+  isMobile = false,
+}: Props) => {
   const {
     currentSpread,
     nextSpread,
@@ -45,6 +51,7 @@ export const BookSpread = () => {
   } = usePageDrag({
     containerRef,
     currentSpread,
+    isMobile,
     pageCount: pages.length,
     nextSpread,
     prevSpread,
@@ -134,7 +141,7 @@ export const BookSpread = () => {
         />
       </div>
 
-      <BookPageSheet />
+      <BookPageSheet isMobile={isMobile} />
 
       {/* navigation */}
       <div
